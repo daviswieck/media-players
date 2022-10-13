@@ -4,11 +4,14 @@ substitutions:
   wifi_ap_password: ""
 
 esphome:
-  name: "${name}"
-  name_add_mac_suffix: true
-  project:
-    name: raspiaudio.muse-proto
-    version: "1.0"
+  on_boot:
+    priority: 10
+    then:
+     - lambda: |-
+          gpio_reset_pin(GPIO_NUM_23);
+          gpio_set_direction(GPIO_NUM_23, GPIO_MODE_OUTPUT);           
+          gpio_set_pull_mode(GPIO_NUM_23, GPIO_PULLDOWN_ONLY);
+          gpio_set_level(GPIO_NUM_23, 0);    
 
 esp32:
   board: esp-wrover-kit
@@ -33,7 +36,7 @@ improv_serial:
 media_player:
   - platform: i2s_audio
     id: media_out
-    name: ${friendly_name}
+    name: my player
     dac_type: external
     i2s_lrclk_pin: GPIO25
     i2s_dout_pin: GPIO26
@@ -43,22 +46,22 @@ media_player:
       number: GPIO21
       inverted: true
 
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO0
-      inverted: true
-      mode:
-        input: true
-        pullup: true
-    name: ${friendly_name} Button
-    on_click:
-      - media_player.toggle: media_out
+#binary_sensor:
+ # - platform: gpio
+ #   pin:
+ #     number: GPIO0
+ #     inverted: true
+ #     mode:
+ #       input: true
+ #       pullup: true
+ #   name: ${friendly_name} Button
+ #   on_click:
+ #     - media_player.toggle: media_out
 
-light:
-  - platform: fastled_clockless
-    name: ${friendly_name}
-    pin: GPIO22
-    chipset: SK6812
-    num_leds: 1
-    rgb_order: grb
+#light:
+#  - platform: fastled_clockless
+#    name: ${friendly_name}
+#    pin: GPIO22
+#    chipset: SK6812
+#    num_leds: 1
+#    rgb_order: grb
